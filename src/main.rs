@@ -12,7 +12,7 @@ use std::{
 fn main() -> io::Result<()> {
     let args: Vec<String> = env::args().collect();
 
-    let top_level_dir = args.last().expect("");
+    let top_level_dir = args.last().unwrap();
     let mut entries = fs::read_dir(top_level_dir)?
         .map(|res| res.map(|e| e.path()))
         .collect::<Result<Vec<_>, io::Error>>()?;
@@ -27,7 +27,6 @@ fn main() -> io::Result<()> {
     Ok(())
 }
 
-// one possible implementation of walking a directory only visiting files
 fn visit_dirs(dir: &Path) -> io::Result<u64> {
     let mut bytes_saved = 0;
     if dir.is_dir() {
@@ -42,10 +41,18 @@ fn visit_dirs(dir: &Path) -> io::Result<u64> {
                         let dir_size = get_size(&path).unwrap_or(0);
                         let byte = Byte::from_u64(dir_size);
                         println!(
-                            "Deleting node_modules at loc: {:?} with size {byte:#}",
+                            "Deleting node_modules @ loc: {:?} with size {byte:#}",
                             path
                         );
-                        let _ = fs::remove_dir_all(path);
+                        let msg = match fs::remove_dir_all(&path) {
+                            Err(_) => {
+                                "Could not delete"
+                            }
+                            Ok(_) => {
+                               "Deleted"
+                            }
+                        };
+                        println!("{} node_modules @ loc: {:?}", msg, path);
 
                         bytes_saved += dir_size;
                     }
