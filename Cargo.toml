@@ -1,0 +1,8 @@
+[package]
+name = "fs-cleaner"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+byte-unit = "5.1.6"
+fs_extra = "1.3.0"
